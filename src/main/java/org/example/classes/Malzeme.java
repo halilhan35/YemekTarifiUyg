@@ -1,7 +1,5 @@
 package org.example.classes;
 
-import java.math.BigDecimal;
-
 public class Malzeme {
 
     private int malzemeID;

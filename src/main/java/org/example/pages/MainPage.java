@@ -360,8 +360,8 @@ public class MainPage {
 
         varsayilanTarifGosterim();
 
-        JLabel listedeAramakIstediginizTarifAdi = new JLabel("Liste İçinde Aramak İstediğiniz Tarif Adı : ");
-        listedeAramakIstediginizTarifAdi.setBounds(150, 350, 370, 40);
+        JLabel listedeAramakIstediginizTarifAdi = new JLabel("Liste İçinde Aramak İstediğiniz Malzeme / Tarif Adı : ");
+        listedeAramakIstediginizTarifAdi.setBounds(150, 350, 450, 40);
         listedeAramakIstediginizTarifAdi.setHorizontalAlignment(SwingConstants.CENTER);
         listedeAramakIstediginizTarifAdi.setVerticalAlignment(SwingConstants.CENTER);
         listedeAramakIstediginizTarifAdi.setForeground(Color.BLACK);
@@ -371,7 +371,7 @@ public class MainPage {
 
         frame.add(listedeAramakIstediginizTarifAdi);
 
-        dinamikAramaField.setBounds(540, 350, 500, 40);
+        dinamikAramaField.setBounds(610, 347, 450, 45);
         dinamikAramaField.setFont(new Font("Arial", Font.BOLD, 16));
         dinamikAramaField.setHorizontalAlignment(SwingConstants.CENTER);
 
