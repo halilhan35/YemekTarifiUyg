@@ -1,5 +1,6 @@
 package org.example.pages;
 
+import org.example.classes.Tarif;
 import org.example.database.ConnectDB;
 
 import javax.imageio.ImageIO;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 
 public class DeleteRecipePage {
 
-    private ArrayList<String> tarifler = new ArrayList<String>();
+    private ArrayList<Tarif> tarifler = new ArrayList<Tarif>();
 
     private Connection connection;
     private JFrame frame = new JFrame("Food System App");
@@ -45,7 +46,7 @@ public class DeleteRecipePage {
 
         connection = ConnectDB.getConnection();
 
-        tarifAdiListesiYapma();
+        tariflerListesiYapma();
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(null);
@@ -98,43 +99,61 @@ public class DeleteRecipePage {
         tarifAdiField.setBounds(420, 130, 250, 40);
         tarifAdiField.setFont(new Font("Arial", Font.BOLD, 15));
 
-        tarifSilButton.setBounds(330,190,150,50);
+        tarifSilButton.setBounds(330, 190, 150, 50);
         tarifSilButton.setFont(new Font("Arial", Font.BOLD, 15));
 
         tarifSilButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String tarifAdi = tarifAdiField.getText().toString();
+                int tarifID = -1;
 
-                if(tarifAdi.isEmpty()){
+                for (int i = 0; i < tarifler.size(); i++) {
+                    if (tarifler.get(i).getTarifAdi().equalsIgnoreCase(tarifAdi)) {
+                        tarifID = tarifler.get(i).getTarifID();
+                    }
+                }
+
+                if (tarifAdi.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Önce silmek istediğiniz tarif adını yazmalısınız.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (!tarifler.contains(tarifAdi)) {
+                if (tarifID == -1) {
                     JOptionPane.showMessageDialog(null, "Yazdığınız tarif, tarif listesinde bulunmuyor.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                String query = "DELETE FROM tarifler WHERE tarifadi = ?";
+                String query1 = "DELETE FROM favoriler WHERE tarifid = ?";
+                String query2 = "DELETE FROM tarifler WHERE tarifid = ?";
 
                 try {
-                    PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, tarifAdi);
+                    PreparedStatement stmt1 = connection.prepareStatement(query1);
+                    stmt1.setInt(1, tarifID);
 
-                    int rowsAffected = stmt.executeUpdate();
-                    if (rowsAffected > 0) {
-                        JOptionPane.showMessageDialog(null, "Tarif başarıyla silindi!", "Başarılı", JOptionPane.INFORMATION_MESSAGE);
-                        frame.dispose();
-                        DeleteRecipePage deleteRecipePage = new DeleteRecipePage();
-                        deleteRecipePage.createAndShowGUI();
+                    int rowsAffected1 = stmt1.executeUpdate();
+                    if (rowsAffected1 > 0) {
+                        PreparedStatement stmt2 = connection.prepareStatement(query2);
+                        stmt2.setInt(1, tarifID);
+
+                        int rowsAffected2 = stmt2.executeUpdate();
+                        if (rowsAffected2 > 0) {
+                            JOptionPane.showMessageDialog(null, "Tarif başarıyla silindi!", "Başarılı", JOptionPane.INFORMATION_MESSAGE);
+                            frame.dispose();
+                            DeleteRecipePage deleteRecipePage = new DeleteRecipePage();
+                            deleteRecipePage.createAndShowGUI();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Tarif bulunamadı.", "Hata", JOptionPane.ERROR_MESSAGE);
+                        }
                     } else {
-                        JOptionPane.showMessageDialog(null, "Tarif bulunamadı.", "Hata", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Favorilerde bu tarif bulunamadı.", "Hata", JOptionPane.ERROR_MESSAGE);
                     }
+
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Tarif veritabanından silinirken bir hata oluştu.", "Hata", JOptionPane.ERROR_MESSAGE);
                 }
+
             }
         });
 
@@ -173,8 +192,8 @@ public class DeleteRecipePage {
         tarifListeAlani.setEditable(false);
         tarifListeAlani.setFont(new Font("Arial", Font.BOLD, 15));
 
-        for (String tarifAdi : tarifler) {
-            tarifListeAlani.append(tarifAdi + "\n\n");
+        for (Tarif tarifAdi : tarifler) {
+            tarifListeAlani.append(tarifAdi.getTarifAdi() + "\n\n");
         }
 
         scrollPane.setBounds(200, 420, 400, 270);
@@ -189,34 +208,40 @@ public class DeleteRecipePage {
         frame.add(tarifAramaField);
         frame.add(scrollPane);
 
-
         frame.setSize(800, 800);
         frame.setVisible(true);
 
     }
 
-    public void tarifAdiListesiYapma(){
+    public void tariflerListesiYapma() {
         try {
-            String query = "SELECT tarifadi FROM tarifler";
+            String query = "SELECT * FROM tarifler";
             PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
+                int tarifId = rs.getInt("tarifid");
                 String tarifAdi = rs.getString("tarifadi");
-                tarifler.add(tarifAdi);
+                String tarifKategori = rs.getString("kategori");
+                int tarifHazirlamaSuresi = rs.getInt("hazirlamasuresi");
+                String tarifTalimatlar = rs.getString("talimatlar");
+
+                Tarif tarif = new Tarif(tarifId, tarifAdi, tarifKategori, tarifHazirlamaSuresi, tarifTalimatlar, null);
+                tarifler.add(tarif);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
     }
 
     private void tarifArama() {
         String searchTerm = tarifAramaField.getText().toLowerCase();
         StringBuilder results = new StringBuilder();
 
-        for (String tarifAdi : tarifler) {
-            if (tarifAdi.toLowerCase().contains(searchTerm)) {
+        for (Tarif tarifAdi : tarifler) {
+            if (tarifAdi.getTarifAdi().toLowerCase().contains(searchTerm)) {
                 results.append(tarifAdi).append("\n\n");
             }
         }

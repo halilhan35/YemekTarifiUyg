@@ -188,6 +188,7 @@ public class AddRecipePage {
 
         secimKaydetmeButton.addActionListener(new ActionListener() {
             int j = 0;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 String secilenMalzeme = MalzemeSecimAlani.getSelectedText();
@@ -204,7 +205,7 @@ public class AddRecipePage {
                 for (int i = 0; i < secilenMalzemeler.size(); i++) {
                     String malzeme = secilenMalzemeler.get(i);
                     String birim = birimler.get(i);
-                    for(Malzeme malzemeNesnesi : malzemeler) {
+                    for (Malzeme malzemeNesnesi : malzemeler) {
                         if (malzemeNesnesi.getMalzemeAdi().equals(malzeme)) {
                             combinedText.append(birim).append(" ")
                                     .append(malzemeNesnesi.getMalzemeBirim()).append(" ")
@@ -254,17 +255,17 @@ public class AddRecipePage {
 
                 tarifAdlariAlma();
 
-                if(tarifler.contains(tarifAdi) || tarifler.contains(ilkHarfiBuyukYapmak(tarifAdi))){
+                if (tarifler.contains(tarifAdi) || tarifler.contains(ilkHarfiBuyukYapmak(tarifAdi))) {
                     JOptionPane.showMessageDialog(null, "Bu tarif zaten var.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if(tarifAdi.isEmpty()){
+                if (tarifAdi.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Tarif adını boş bırakamazsınız.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if(kategori.isEmpty()){
+                if (kategori.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Kategoriyi boş bırakamazsınız.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -299,6 +300,7 @@ public class AddRecipePage {
                     if (rs.next()) {
                         yeniTarifId = rs.getInt(1);
                         malzemeTarifIliskisi();
+                        favorilerIliskisi();
                         JOptionPane.showMessageDialog(null, "Tarif başarıyla kaydedildi!", "Başarılı", JOptionPane.INFORMATION_MESSAGE);
                         frame.dispose();
                         AddRecipePage addRecipePage = new AddRecipePage();
@@ -415,7 +417,21 @@ public class AddRecipePage {
         }
     }
 
-    private void tarifAdlariAlma(){
+    private void favorilerIliskisi() {
+        String query = "INSERT INTO favoriler (tarifid,favoridurumu) VALUES (?, ?)";
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setInt(1, yeniTarifId);
+            stmt.setBoolean(2, false);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Veritabanına kaydedilirken bir hata oluştu.", "Hata", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void tarifAdlariAlma() {
         try {
             String query = "SELECT tarifadi FROM tarifler";
             PreparedStatement stmt = connection.prepareStatement(query);

@@ -37,7 +37,7 @@ public class UpdateMaterialPage {
     private JButton bilgiGetirButton = new JButton("Bilgileri Getir");
     private JButton guncellemeleriKaydetButton = new JButton("Güncellemeleri Kaydet");
 
-    private JTextField  malzemeAdiGetiriciField = new JTextField(null);
+    private JTextField malzemeAdiGetiriciField = new JTextField(null);
     private JTextField malzemeAdiField = new JTextField(null);
     private JTextField malzemeToplamMiktarField = new JTextField(null);
     private JTextField malzemeBirimField = new JTextField(null);
@@ -108,27 +108,27 @@ public class UpdateMaterialPage {
         malzemeAdiGetiriciField.setBounds(370, 130, 230, 40);
         malzemeAdiGetiriciField.setFont(new Font("Arial", Font.BOLD, 15));
 
-        bilgiGetirButton.setBounds(620,125,150,50);
-        bilgiGetirButton.setFont(new Font("Arial",Font.BOLD,15));
+        bilgiGetirButton.setBounds(620, 125, 150, 50);
+        bilgiGetirButton.setFont(new Font("Arial", Font.BOLD, 15));
 
         bilgiGetirButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String malzemeAdi = malzemeAdiGetiriciField.getText().toString();
 
-                    if (!malzemelerAd.contains(malzemeAdi) && !malzemelerAd.contains(ilkHarfiBuyukYapmak(malzemeAdi))) {
-                        JOptionPane.showMessageDialog(null, "Lütfen var olan bir malzeme adı girmeye dikkat edin.", "Hata", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
+                if (!malzemelerAd.contains(malzemeAdi) && !malzemelerAd.contains(ilkHarfiBuyukYapmak(malzemeAdi))) {
+                    JOptionPane.showMessageDialog(null, "Lütfen var olan bir malzeme adı girmeye dikkat edin.", "Hata", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-                    for(Malzeme malzeme : malzemeler){
-                        if(malzeme.getMalzemeAdi().equalsIgnoreCase(malzemeAdi) || malzeme.getMalzemeAdi().equalsIgnoreCase(ilkHarfiBuyukYapmak(malzemeAdi))){
-                            malzemeAdiField.setText(malzeme.getMalzemeAdi());
-                            malzemeToplamMiktarField.setText(malzeme.getToplamMiktar());
-                            malzemeBirimField.setText(malzeme.getMalzemeBirim());
-                            malzemeBirimFiyatField.setText(malzeme.getMalzemeFiyat().toString());
-                        }
+                for (Malzeme malzeme : malzemeler) {
+                    if (malzeme.getMalzemeAdi().equalsIgnoreCase(malzemeAdi) || malzeme.getMalzemeAdi().equalsIgnoreCase(ilkHarfiBuyukYapmak(malzemeAdi))) {
+                        malzemeAdiField.setText(malzeme.getMalzemeAdi());
+                        malzemeToplamMiktarField.setText(malzeme.getToplamMiktar());
+                        malzemeBirimField.setText(malzeme.getMalzemeBirim());
+                        malzemeBirimFiyatField.setText(malzeme.getMalzemeFiyat().toString());
                     }
+                }
             }
         });
 
@@ -183,7 +183,7 @@ public class UpdateMaterialPage {
         jLabelMalzemeBilgileri.setOpaque(true);
         jLabelMalzemeBilgileri.setFont(new Font("Arial", Font.BOLD, 28));
 
-        JLabel jLabelMalzemeAdi= new JLabel("Malzeme Adı : ");
+        JLabel jLabelMalzemeAdi = new JLabel("Malzeme Adı : ");
         jLabelMalzemeAdi.setBounds(200, 500, 150, 40);
         jLabelMalzemeAdi.setHorizontalAlignment(SwingConstants.CENTER);
         jLabelMalzemeAdi.setVerticalAlignment(SwingConstants.CENTER);
@@ -192,11 +192,11 @@ public class UpdateMaterialPage {
         jLabelMalzemeAdi.setOpaque(true);
         jLabelMalzemeAdi.setFont(new Font("Arial", Font.BOLD, 15));
 
-        malzemeAdiField.setBounds(370,500,200,40);
-        malzemeAdiField.setFont(new Font("Arial",Font.BOLD,15));
+        malzemeAdiField.setBounds(370, 500, 200, 40);
+        malzemeAdiField.setFont(new Font("Arial", Font.BOLD, 15));
         malzemeAdiField.setEditable(false);
 
-        JLabel jLabelMalzemeToplamMiktar= new JLabel("Toplam Miktar : ");
+        JLabel jLabelMalzemeToplamMiktar = new JLabel("Toplam Miktar : ");
         jLabelMalzemeToplamMiktar.setBounds(200, 560, 150, 40);
         jLabelMalzemeToplamMiktar.setHorizontalAlignment(SwingConstants.CENTER);
         jLabelMalzemeToplamMiktar.setVerticalAlignment(SwingConstants.CENTER);
@@ -205,10 +205,10 @@ public class UpdateMaterialPage {
         jLabelMalzemeToplamMiktar.setOpaque(true);
         jLabelMalzemeToplamMiktar.setFont(new Font("Arial", Font.BOLD, 15));
 
-        malzemeToplamMiktarField.setBounds(370,560,200,40);
-        malzemeToplamMiktarField.setFont(new Font("Arial",Font.BOLD,15));
+        malzemeToplamMiktarField.setBounds(370, 560, 200, 40);
+        malzemeToplamMiktarField.setFont(new Font("Arial", Font.BOLD, 15));
 
-        JLabel jLabelMalzemeBirim= new JLabel("Malzeme Birimi : ");
+        JLabel jLabelMalzemeBirim = new JLabel("Malzeme Birimi : ");
         jLabelMalzemeBirim.setBounds(200, 620, 150, 40);
         jLabelMalzemeBirim.setHorizontalAlignment(SwingConstants.CENTER);
         jLabelMalzemeBirim.setVerticalAlignment(SwingConstants.CENTER);
@@ -217,10 +217,10 @@ public class UpdateMaterialPage {
         jLabelMalzemeBirim.setOpaque(true);
         jLabelMalzemeBirim.setFont(new Font("Arial", Font.BOLD, 15));
 
-        malzemeBirimField.setBounds(370,620,200,40);
-        malzemeBirimField.setFont(new Font("Arial",Font.BOLD,15));
+        malzemeBirimField.setBounds(370, 620, 200, 40);
+        malzemeBirimField.setFont(new Font("Arial", Font.BOLD, 15));
 
-        JLabel jLabelMalzemeBirimFiyat= new JLabel("Birim Fiyat : ");
+        JLabel jLabelMalzemeBirimFiyat = new JLabel("Birim Fiyat : ");
         jLabelMalzemeBirimFiyat.setBounds(200, 680, 150, 40);
         jLabelMalzemeBirimFiyat.setHorizontalAlignment(SwingConstants.CENTER);
         jLabelMalzemeBirimFiyat.setVerticalAlignment(SwingConstants.CENTER);
@@ -229,11 +229,11 @@ public class UpdateMaterialPage {
         jLabelMalzemeBirimFiyat.setOpaque(true);
         jLabelMalzemeBirimFiyat.setFont(new Font("Arial", Font.BOLD, 15));
 
-        malzemeBirimFiyatField.setBounds(370,680,200,40);
-        malzemeBirimFiyatField.setFont(new Font("Ariel",Font.BOLD,15));
+        malzemeBirimFiyatField.setBounds(370, 680, 200, 40);
+        malzemeBirimFiyatField.setFont(new Font("Ariel", Font.BOLD, 15));
 
-        guncellemeleriKaydetButton.setBounds(590,675,175,50);
-        guncellemeleriKaydetButton.setFont(new Font("Arial",Font.BOLD,15));
+        guncellemeleriKaydetButton.setBounds(590, 675, 175, 50);
+        guncellemeleriKaydetButton.setFont(new Font("Arial", Font.BOLD, 15));
 
         guncellemeleriKaydetButton.addActionListener(new ActionListener() {
             @Override
@@ -251,7 +251,7 @@ public class UpdateMaterialPage {
                 birimler.add("tatlı kaşığı");
                 birimler.add("yemek kaşığı");
 
-                if(malzemeAdi.isEmpty()){
+                if (malzemeAdi.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Malzeme adını boş bırakamazsınız, Lütfen malzeme adı girip bilgileri getir butonuna tıklayın.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -263,7 +263,7 @@ public class UpdateMaterialPage {
                     return;
                 }
 
-                if(malzemeBirim.isEmpty() || !birimler.contains(malzemeBirim)){
+                if (malzemeBirim.isEmpty() || !birimler.contains(malzemeBirim)) {
                     JOptionPane.showMessageDialog(null, "Malzeme birimini mililitre, gram, adet, diş, çay kaşığı, tatlı kaşığı, yemek kaşığı 'ndan farklı giremezsiniz.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }

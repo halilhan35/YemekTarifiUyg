@@ -118,7 +118,7 @@ public class AddMaterialPage {
         malzemeBirimField.setBounds(370, 280, 230, 40);
         malzemeBirimField.setFont(new Font("Arial", Font.BOLD, 15));
 
-        JLabel jLabelBirimFiyat= new JLabel("Birim Fiyat : ");
+        JLabel jLabelBirimFiyat = new JLabel("Birim Fiyat : ");
         jLabelBirimFiyat.setBounds(200, 340, 150, 40);
         jLabelBirimFiyat.setHorizontalAlignment(SwingConstants.CENTER);
         jLabelBirimFiyat.setVerticalAlignment(SwingConstants.CENTER);
@@ -134,7 +134,7 @@ public class AddMaterialPage {
         malzemeyiEkleButton.setBounds(325, 410, 150, 50);
         malzemeyiEkleButton.setFont(new Font("Arial", Font.BOLD, 15));
 
-        JLabel jLabelBirimUyari= new JLabel("Birim ; mililitre, gram, adet, diş, çay kaşığı, tatlı kaşığı veya yemek kaşığı olmalıdır.");
+        JLabel jLabelBirimUyari = new JLabel("Birim ; mililitre, gram, adet, diş, çay kaşığı, tatlı kaşığı veya yemek kaşığı olmalıdır.");
         jLabelBirimUyari.setBounds(50, 500, 700, 50);
         jLabelBirimUyari.setHorizontalAlignment(SwingConstants.CENTER);
         jLabelBirimUyari.setVerticalAlignment(SwingConstants.CENTER);
@@ -161,12 +161,12 @@ public class AddMaterialPage {
 
                 malzemeAdlariAlma();
 
-                if(malzemeler.contains(malzemeAdi) || malzemeler.contains(ilkHarfiBuyukYapmak(malzemeAdi))){
+                if (malzemeler.contains(malzemeAdi) || malzemeler.contains(ilkHarfiBuyukYapmak(malzemeAdi))) {
                     JOptionPane.showMessageDialog(null, "Bu malzeme zaten var, İstersen ana sayfadan güncelleyebilirsin.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if(malzemeAdi.isEmpty()){
+                if (malzemeAdi.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Malzeme adını boş bırakamazsınız.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -178,7 +178,7 @@ public class AddMaterialPage {
                     return;
                 }
 
-                if(malzemeBirim.isEmpty() || !birimler.contains(malzemeBirim)){
+                if (malzemeBirim.isEmpty() || !birimler.contains(malzemeBirim)) {
                     JOptionPane.showMessageDialog(null, "Malzeme birimini varsayılan birimlerden farklı giremezsiniz.", "Hata", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -231,23 +231,23 @@ public class AddMaterialPage {
         frame.setSize(800, 800);
         frame.setVisible(true);
 
-  }
+    }
 
-  public void malzemeAdlariAlma(){
-      try {
-          String query = "SELECT malzemeadi FROM malzemeler";
-          PreparedStatement stmt = connection.prepareStatement(query);
-          ResultSet rs = stmt.executeQuery();
+    public void malzemeAdlariAlma() {
+        try {
+            String query = "SELECT malzemeadi FROM malzemeler";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
 
-          while (rs.next()) {
-              String tarifAdi = rs.getString("malzemeadi");
-              malzemeler.add(tarifAdi);
-          }
+            while (rs.next()) {
+                String tarifAdi = rs.getString("malzemeadi");
+                malzemeler.add(tarifAdi);
+            }
 
-      } catch (SQLException e) {
-          e.printStackTrace();
-      }
-  }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public String ilkHarfiBuyukYapmak(String str) {
         if (str == null || str.isEmpty()) {
