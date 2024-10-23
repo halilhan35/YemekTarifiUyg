@@ -53,7 +53,7 @@ public class UpdateRecipePage {
     private JTextField malzemeEklemeMiktarField = new JTextField(null);
     private JTextField malzemeSilmeAdiField = new JTextField(null);
 
-    int girilenTarifID;
+    private int girilenTarifID;
 
     public void createAndShowGUI() {
 

@@ -26,9 +26,10 @@ public class Favorites {
     private ArrayList<Integer> favoriler = new ArrayList<Integer>();
     private ArrayList<Tarif> tarifler = new ArrayList<Tarif>();
     private ArrayList<Malzeme> malzemeler = new ArrayList<Malzeme>();
-    private java.util.List<Integer> kullanilanMalzemeIdleri = new ArrayList<Integer>();
+    private List<Integer> kullanilanMalzemeIdleri = new ArrayList<Integer>();
     private List<Double> kullanilanMalzemeMiktarlari = new ArrayList<Double>();
     private HashMap<Integer, Double> maliyetMap = new HashMap<Integer, Double>();
+    private HashMap<Integer, Double> toplamMaliyetMap = new HashMap<Integer, Double>();
 
     private JTextField favoriEkleText = new JTextField(null);
     private JTextField favoriSilText = new JTextField(null);
@@ -258,6 +259,7 @@ public class Favorites {
 
         for (int i = 0; i < tarifler.size(); i++) {
 
+            double gerekenMaliyet = 0;
             double toplamMaliyet = 0;
             kullanilanMalzemeIdleri.clear();
             kullanilanMalzemeMiktarlari.clear();
@@ -297,14 +299,18 @@ public class Favorites {
                             malzemeToplamMiktar = 0.0;
                         }
                         if (malzemeToplamMiktar < kullanilanMalzemeMiktarlari.get(j)) {
-                            toplamMaliyet += (kullanilanMalzemeMiktarlari.get(j) - malzemeToplamMiktar) * malzeme.getMalzemeFiyat();
+                            gerekenMaliyet += (kullanilanMalzemeMiktarlari.get(j) - malzemeToplamMiktar) * malzeme.getMalzemeFiyat();
                         }
+
+                        toplamMaliyet += kullanilanMalzemeMiktarlari.get(j)*malzeme.getMalzemeFiyat();
+
+
                     }
                 }
             }
 
-            maliyetMap.put(tarifler.get(i).getTarifID(), toplamMaliyet);
-
+            maliyetMap.put(tarifler.get(i).getTarifID(), gerekenMaliyet);
+            toplamMaliyetMap.put(tarifler.get(i).getTarifID(),toplamMaliyet);
         }
     }
 
@@ -315,7 +321,8 @@ public class Favorites {
 
             for (int j = 0; j < tarifler.size(); j++) {
                 if (favoriler.get(i) == tarifler.get(j).getTarifID()) {
-                    double toplamMaliyet = maliyetMap.get(tarifler.get(j).getTarifID());
+                    double gerekenMaliyet = maliyetMap.get(tarifler.get(j).getTarifID());
+                    double toplamMaliyet = toplamMaliyetMap.get(tarifler.get(j).getTarifID());
 
                     try {
                         File imageFile = new File("src/main/java/org/example/drawables/recipe_" + tarifler.get(j).getTarifID() + ".jpeg");
@@ -341,7 +348,7 @@ public class Favorites {
                     }
 
                     JPanel infoPanel = new JPanel();
-                    infoPanel.setLayout(new GridLayout(3, 1));
+                    infoPanel.setLayout(new GridLayout(4, 1));
 
                     JLabel tarifAdiLabel = new JLabel(tarifler.get(j).getTarifAdi(), SwingConstants.CENTER);
 
@@ -349,15 +356,20 @@ public class Favorites {
 
                     System.out.println("Tarif : " + tarifler.get(j).getTarifID() + " işleniyor ve getiriliyor.");
 
-                    JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+                    JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
 
-                    if (toplamMaliyet > 0.0) {
+                    JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
+
+                    if (gerekenMaliyet > 0.0) {
                         tarifAdiLabel.setForeground(Color.RED);
                         tarifAdiLabel.setBackground(Color.BLACK);
                         tarifAdiLabel.setOpaque(true);
                         tarifHazirlamaSuresiLabel.setForeground(Color.RED);
                         tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                         tarifHazirlamaSuresiLabel.setOpaque(true);
+                        sumCostLabel.setForeground(Color.RED);
+                        sumCostLabel.setBackground(Color.BLACK);
+                        sumCostLabel.setOpaque(true);
                         costLabel.setForeground(Color.RED);
                         costLabel.setBackground(Color.BLACK);
                         costLabel.setOpaque(true);
@@ -368,6 +380,9 @@ public class Favorites {
                         tarifHazirlamaSuresiLabel.setForeground(Color.GREEN);
                         tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                         tarifHazirlamaSuresiLabel.setOpaque(true);
+                        sumCostLabel.setForeground(Color.GREEN);
+                        sumCostLabel.setBackground(Color.BLACK);
+                        sumCostLabel.setOpaque(true);
                         costLabel.setForeground(Color.GREEN);
                         costLabel.setBackground(Color.BLACK);
                         costLabel.setOpaque(true);
@@ -375,6 +390,7 @@ public class Favorites {
 
                     infoPanel.add(tarifAdiLabel);
                     infoPanel.add(tarifHazirlamaSuresiLabel);
+                    infoPanel.add(sumCostLabel);
                     infoPanel.add(costLabel);
 
                     singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);

@@ -25,6 +25,7 @@ public class AddMaterialPage {
     JFrame frame = new JFrame("Food System App");
 
     private JButton geriButton = new JButton("Geri");
+    private JButton malzemeyiEkleButton = new JButton("Malzemeyi Ekle");
 
     JTextField malzemeAdiField = new JTextField(null);
     JTextField malzemeToplamMiktarField = new JTextField(null);
@@ -130,7 +131,6 @@ public class AddMaterialPage {
         malzemeBirimFiyatField.setBounds(370, 340, 230, 40);
         malzemeBirimFiyatField.setFont(new Font("Arial", Font.BOLD, 15));
 
-        JButton malzemeyiEkleButton = new JButton("Malzemeyi Ekle");
         malzemeyiEkleButton.setBounds(325, 410, 150, 50);
         malzemeyiEkleButton.setFont(new Font("Arial", Font.BOLD, 15));
 

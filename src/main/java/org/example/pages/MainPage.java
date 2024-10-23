@@ -35,11 +35,13 @@ public class MainPage {
     private List<Integer> kullanilanMalzemeIdleri = new ArrayList<Integer>();
     private List<Double> kullanilanMalzemeMiktarlari = new ArrayList<Double>();
     private HashMap<Integer, Double> maliyetMap = new HashMap<Integer, Double>();
+    private HashMap<Integer, Double> toplamMaliyetMap = new HashMap<Integer, Double>();
 
     private JButton tarifEkleButton = new JButton("Tarif Ekle");
     private JButton tarifGuncelleButton = new JButton("Tarif Güncelle");
     private JButton tarifSilButton = new JButton("Tarif Sil");
     private JButton malzemeGuncelleButton = new JButton("Malzeme Güncelle");
+    private JButton tarifDetayButton = new JButton("Tarif Detayı");
 
     private JLabel ListeAciklama = new JLabel();
     private JTextField dinamikAramaField = new JTextField(null);
@@ -69,17 +71,20 @@ public class MainPage {
         panel.setLayout(null);
         frame.setContentPane(panel);
 
-        tarifEkleButton.setBounds(1025, 25, 150, 50);
+        tarifEkleButton.setBounds(1025, 17, 150, 45);
         tarifEkleButton.setFont(new Font("Arial", Font.BOLD, 15));
 
-        tarifGuncelleButton.setBounds(1025, 95, 150, 50);
+        tarifGuncelleButton.setBounds(1025, 72, 150, 45);
         tarifGuncelleButton.setFont(new Font("Arial", Font.BOLD, 15));
 
-        tarifSilButton.setBounds(1025, 165, 150, 50);
+        tarifSilButton.setBounds(1025, 127, 150, 45);
         tarifSilButton.setFont(new Font("Arial", Font.BOLD, 15));
 
-        malzemeGuncelleButton.setBounds(1025, 235, 150, 50);
+        malzemeGuncelleButton.setBounds(1025, 182, 150, 45);
         malzemeGuncelleButton.setFont(new Font("Arial", Font.BOLD, 15));
+
+        tarifDetayButton.setBounds(1025, 237, 150, 45);
+        tarifDetayButton.setFont(new Font("Arial", Font.BOLD, 15));
 
         tarifEkleButton.addActionListener(new ActionListener() {
             @Override
@@ -123,10 +128,20 @@ public class MainPage {
             }
         });
 
+        tarifDetayButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                RecipeInfoPage recipeInfoPage = new RecipeInfoPage();
+                recipeInfoPage.createAndShowGUI();
+            }
+        });
+
         frame.add(tarifEkleButton);
         frame.add(tarifGuncelleButton);
         frame.add(tarifSilButton);
         frame.add(malzemeGuncelleButton);
+        frame.add(tarifDetayButton);
 
         JLabel filtrelemeSecenekleri = new JLabel("FİLTRELEME SEÇENEKLERİ");
         filtrelemeSecenekleri.setBounds(10, 20, 975, 40);
@@ -448,6 +463,7 @@ public class MainPage {
 
         for (int i = 0; i < tarifler.size(); i++) {
 
+            double gerekenMaliyet = 0;
             double toplamMaliyet = 0;
             kullanilanMalzemeIdleri.clear();
             kullanilanMalzemeMiktarlari.clear();
@@ -487,14 +503,17 @@ public class MainPage {
                             malzemeToplamMiktar = 0.0;
                         }
                         if (malzemeToplamMiktar < kullanilanMalzemeMiktarlari.get(j)) {
-                            toplamMaliyet += (kullanilanMalzemeMiktarlari.get(j) - malzemeToplamMiktar) * malzeme.getMalzemeFiyat();
+                            gerekenMaliyet += (kullanilanMalzemeMiktarlari.get(j) - malzemeToplamMiktar) * malzeme.getMalzemeFiyat();
                         }
+
+                        toplamMaliyet += kullanilanMalzemeMiktarlari.get(j)*malzeme.getMalzemeFiyat();
+
                     }
                 }
             }
 
-            maliyetMap.put(tarifler.get(i).getTarifID(), toplamMaliyet);
-
+            maliyetMap.put(tarifler.get(i).getTarifID(), gerekenMaliyet);
+            toplamMaliyetMap.put(tarifler.get(i).getTarifID(), toplamMaliyet);
         }
     }
 
@@ -511,7 +530,8 @@ public class MainPage {
                     JPanel singleTarifPanel = new JPanel();
                     singleTarifPanel.setLayout(new BorderLayout());
 
-                    double toplamMaliyet = maliyetMap.get(tarifFiltreleyiciler.get(i).getTarifID());
+                    double gerekenMaliyet = maliyetMap.get(tarifFiltreleyiciler.get(i).getTarifID());
+                    double toplamMaliyet = toplamMaliyetMap.get(tarifFiltreleyiciler.get(i).getTarifID());
 
                     try {
                         File imageFile = new File("src/main/java/org/example/drawables/recipe_" + tarifFiltreleyiciler.get(i).getTarifID() + ".jpeg");
@@ -537,19 +557,23 @@ public class MainPage {
                     }
 
                     JPanel infoPanel = new JPanel();
-                    infoPanel.setLayout(new GridLayout(3, 1));
+                    infoPanel.setLayout(new GridLayout(4, 1));
 
                     JLabel tarifAdiLabel = new JLabel(tarifFiltreleyiciler.get(i).getTarifAdi(), SwingConstants.CENTER);
                     JLabel tarifHazirlamaSuresiLabel = new JLabel("Hazırlama Süresi : " + tarifFiltreleyiciler.get(i).getHazirlamaSuresi() + " dakika", SwingConstants.CENTER);
-                    JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+                    JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+                    JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
 
-                    if (toplamMaliyet > 0.0) {
+                    if (gerekenMaliyet > 0.0) {
                         tarifAdiLabel.setForeground(Color.RED);
                         tarifAdiLabel.setBackground(Color.BLACK);
                         tarifAdiLabel.setOpaque(true);
                         tarifHazirlamaSuresiLabel.setForeground(Color.RED);
                         tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                         tarifHazirlamaSuresiLabel.setOpaque(true);
+                        sumCostLabel.setForeground(Color.RED);
+                        sumCostLabel.setBackground(Color.BLACK);
+                        sumCostLabel.setOpaque(true);
                         costLabel.setForeground(Color.RED);
                         costLabel.setBackground(Color.BLACK);
                         costLabel.setOpaque(true);
@@ -560,6 +584,9 @@ public class MainPage {
                         tarifHazirlamaSuresiLabel.setForeground(Color.GREEN);
                         tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                         tarifHazirlamaSuresiLabel.setOpaque(true);
+                        sumCostLabel.setForeground(Color.GREEN);
+                        sumCostLabel.setBackground(Color.BLACK);
+                        sumCostLabel.setOpaque(true);
                         costLabel.setForeground(Color.GREEN);
                         costLabel.setBackground(Color.BLACK);
                         costLabel.setOpaque(true);
@@ -569,6 +596,7 @@ public class MainPage {
 
                     infoPanel.add(tarifAdiLabel);
                     infoPanel.add(tarifHazirlamaSuresiLabel);
+                    infoPanel.add(sumCostLabel);
                     infoPanel.add(costLabel);
 
                     singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);
@@ -667,7 +695,8 @@ public class MainPage {
             JPanel singleTarifPanel = new JPanel();
             singleTarifPanel.setLayout(new BorderLayout());
 
-            double toplamMaliyet = maliyetMap.get(tarifler.get(i).getTarifID());
+            double gerekenMaliyet = maliyetMap.get(tarifler.get(i).getTarifID());
+            double toplamMaliyet = toplamMaliyetMap.get(tarifler.get(i).getTarifID());
 
             try {
                 File imageFile = new File("src/main/java/org/example/drawables/recipe_" + tarifler.get(i).getTarifID() + ".jpeg");
@@ -693,19 +722,23 @@ public class MainPage {
             }
 
             JPanel infoPanel = new JPanel();
-            infoPanel.setLayout(new GridLayout(3, 1));
+            infoPanel.setLayout(new GridLayout(4, 1));
 
             JLabel tarifAdiLabel = new JLabel(tarifler.get(i).getTarifAdi(), SwingConstants.CENTER);
             JLabel tarifHazirlamaSuresiLabel = new JLabel("Hazırlama Süresi : " + tarifler.get(i).getHazirlamaSuresi() + " dakika", SwingConstants.CENTER);
-            JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
 
-            if (toplamMaliyet > 0.0) {
+            if (gerekenMaliyet > 0.0) {
                 tarifAdiLabel.setForeground(Color.RED);
                 tarifAdiLabel.setBackground(Color.BLACK);
                 tarifAdiLabel.setOpaque(true);
                 tarifHazirlamaSuresiLabel.setForeground(Color.RED);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.RED);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.RED);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
@@ -716,6 +749,9 @@ public class MainPage {
                 tarifHazirlamaSuresiLabel.setForeground(Color.GREEN);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.GREEN);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.GREEN);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
@@ -725,6 +761,7 @@ public class MainPage {
 
             infoPanel.add(tarifAdiLabel);
             infoPanel.add(tarifHazirlamaSuresiLabel);
+            infoPanel.add(sumCostLabel);
             infoPanel.add(costLabel);
 
             singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);
@@ -818,7 +855,8 @@ public class MainPage {
             JPanel singleTarifPanel = new JPanel();
             singleTarifPanel.setLayout(new BorderLayout());
 
-            double toplamMaliyet = maliyetMap.get(tarifler.get(i).getTarifID());
+            double gerekenMaliyet = maliyetMap.get(tarifler.get(i).getTarifID());
+            double toplamMaliyet = toplamMaliyetMap.get(tarifler.get(i).getTarifID());
 
             ListeAciklama.setText("MALİYETSİZ TARİFLER LİSTESİ");
 
@@ -846,7 +884,7 @@ public class MainPage {
             }
 
             JPanel infoPanel = new JPanel();
-            infoPanel.setLayout(new GridLayout(3, 1));
+            infoPanel.setLayout(new GridLayout(4, 1));
 
             JLabel tarifAdiLabel = new JLabel(tarifler.get(i).getTarifAdi(), SwingConstants.CENTER);
 
@@ -854,7 +892,9 @@ public class MainPage {
 
             System.out.println("Tarif : " + tarifler.get(i).getTarifID() + " işleniyor ve getiriliyor.");
 
-            JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+
+            JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
 
             tarifAdiLabel.setForeground(Color.GREEN);
             tarifAdiLabel.setBackground(Color.BLACK);
@@ -862,12 +902,16 @@ public class MainPage {
             tarifHazirlamaSuresiLabel.setForeground(Color.GREEN);
             tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
             tarifHazirlamaSuresiLabel.setOpaque(true);
+            sumCostLabel.setForeground(Color.GREEN);
+            sumCostLabel.setBackground(Color.BLACK);
+            sumCostLabel.setOpaque(true);
             costLabel.setForeground(Color.GREEN);
             costLabel.setBackground(Color.BLACK);
             costLabel.setOpaque(true);
 
             infoPanel.add(tarifAdiLabel);
             infoPanel.add(tarifHazirlamaSuresiLabel);
+            infoPanel.add(sumCostLabel);
             infoPanel.add(costLabel);
 
             singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);
@@ -889,7 +933,8 @@ public class MainPage {
             JPanel singleTarifPanel = new JPanel();
             singleTarifPanel.setLayout(new BorderLayout());
 
-            double toplamMaliyet = maliyetMap.get(tarifler.get(i).getTarifID());
+            double gerekenMaliyet = maliyetMap.get(tarifler.get(i).getTarifID());
+            double toplamMaliyet = toplamMaliyetMap.get(tarifler.get(i).getTarifID());
 
             ListeAciklama.setText("MALİYETLİ TARİFLER LİSTESİ");
 
@@ -917,7 +962,7 @@ public class MainPage {
             }
 
             JPanel infoPanel = new JPanel();
-            infoPanel.setLayout(new GridLayout(3, 1));
+            infoPanel.setLayout(new GridLayout(4, 1));
 
             JLabel tarifAdiLabel = new JLabel(tarifler.get(i).getTarifAdi(), SwingConstants.CENTER);
 
@@ -925,7 +970,9 @@ public class MainPage {
 
             System.out.println("Tarif : " + tarifler.get(i).getTarifID() + " işleniyor ve getiriliyor.");
 
-            JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+
+            JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
 
             tarifAdiLabel.setForeground(Color.RED);
             tarifAdiLabel.setBackground(Color.BLACK);
@@ -933,12 +980,16 @@ public class MainPage {
             tarifHazirlamaSuresiLabel.setForeground(Color.RED);
             tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
             tarifHazirlamaSuresiLabel.setOpaque(true);
+            sumCostLabel.setForeground(Color.RED);
+            sumCostLabel.setBackground(Color.BLACK);
+            sumCostLabel.setOpaque(true);
             costLabel.setForeground(Color.RED);
             costLabel.setBackground(Color.BLACK);
             costLabel.setOpaque(true);
 
             infoPanel.add(tarifAdiLabel);
             infoPanel.add(tarifHazirlamaSuresiLabel);
+            infoPanel.add(sumCostLabel);
             infoPanel.add(costLabel);
 
             singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);
@@ -958,8 +1009,8 @@ public class MainPage {
         List<Tarif> sortedTarifler = new ArrayList<>(tarifler);
 
         sortedTarifler.sort((tarif1, tarif2) -> {
-            double maliyet1 = maliyetMap.get(tarif1.getTarifID());
-            double maliyet2 = maliyetMap.get(tarif2.getTarifID());
+            double maliyet1 = toplamMaliyetMap.get(tarif1.getTarifID());
+            double maliyet2 = toplamMaliyetMap.get(tarif2.getTarifID());
             return Double.compare(maliyet2, maliyet1);
         });
 
@@ -972,7 +1023,8 @@ public class MainPage {
             JPanel singleTarifPanel = new JPanel();
             singleTarifPanel.setLayout(new BorderLayout());
 
-            double toplamMaliyet = maliyetMap.get(sortedTarifler.get(i).getTarifID());
+            double gerekenMaliyet = maliyetMap.get(sortedTarifler.get(i).getTarifID());
+            double toplamMaliyet = toplamMaliyetMap.get(sortedTarifler.get(i).getTarifID());
 
             ListeAciklama.setText("AZALAN MALİYETLİ TARİFLER LİSTESİ");
 
@@ -1000,21 +1052,25 @@ public class MainPage {
             }
 
             JPanel infoPanel = new JPanel();
-            infoPanel.setLayout(new GridLayout(3, 1));
+            infoPanel.setLayout(new GridLayout(4, 1));
 
             JLabel tarifAdiLabel = new JLabel(sortedTarifler.get(i).getTarifAdi(), SwingConstants.CENTER);
             JLabel tarifHazirlamaSuresiLabel = new JLabel("Hazırlama Süresi : " + String.valueOf(sortedTarifler.get(i).getHazirlamaSuresi()) + " dakika", SwingConstants.CENTER);
-            JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
 
             System.out.println("Tarif : " + tarifler.get(i).getTarifID() + " işleniyor ve getiriliyor.");
 
-            if (toplamMaliyet > 0.0) {
+            if (gerekenMaliyet > 0.0) {
                 tarifAdiLabel.setForeground(Color.RED);
                 tarifAdiLabel.setBackground(Color.BLACK);
                 tarifAdiLabel.setOpaque(true);
                 tarifHazirlamaSuresiLabel.setForeground(Color.RED);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.RED);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.RED);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
@@ -1025,12 +1081,17 @@ public class MainPage {
                 tarifHazirlamaSuresiLabel.setForeground(Color.GREEN);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.GREEN);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.GREEN);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
             }
+
             infoPanel.add(tarifAdiLabel);
             infoPanel.add(tarifHazirlamaSuresiLabel);
+            infoPanel.add(sumCostLabel);
             infoPanel.add(costLabel);
 
             singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);
@@ -1049,8 +1110,8 @@ public class MainPage {
         List<Tarif> sortedTarifler = new ArrayList<>(tarifler);
 
         sortedTarifler.sort((tarif1, tarif2) -> {
-            double maliyet1 = maliyetMap.get(tarif1.getTarifID());
-            double maliyet2 = maliyetMap.get(tarif2.getTarifID());
+            double maliyet1 = toplamMaliyetMap.get(tarif1.getTarifID());
+            double maliyet2 = toplamMaliyetMap.get(tarif2.getTarifID());
             return Double.compare(maliyet1, maliyet2);
         });
 
@@ -1062,7 +1123,8 @@ public class MainPage {
             JPanel singleTarifPanel = new JPanel();
             singleTarifPanel.setLayout(new BorderLayout());
 
-            double toplamMaliyet = maliyetMap.get(sortedTarifler.get(i).getTarifID());
+            double gerekenMaliyet = maliyetMap.get(sortedTarifler.get(i).getTarifID());
+            double toplamMaliyet = toplamMaliyetMap.get(sortedTarifler.get(i).getTarifID());
 
             ListeAciklama.setText("ARTAN MALİYETLİ TARİFLER LİSTESİ");
 
@@ -1090,21 +1152,25 @@ public class MainPage {
             }
 
             JPanel infoPanel = new JPanel();
-            infoPanel.setLayout(new GridLayout(3, 1));
+            infoPanel.setLayout(new GridLayout(4, 1));
 
             JLabel tarifAdiLabel = new JLabel(sortedTarifler.get(i).getTarifAdi(), SwingConstants.CENTER);
             JLabel tarifHazirlamaSuresiLabel = new JLabel("Hazırlama Süresi : " + String.valueOf(sortedTarifler.get(i).getHazirlamaSuresi()) + " dakika", SwingConstants.CENTER);
-            JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
 
             System.out.println("Tarif : " + tarifler.get(i).getTarifID() + " işleniyor ve getiriliyor.");
 
-            if (toplamMaliyet > 0.0) {
+            if (gerekenMaliyet > 0.0) {
                 tarifAdiLabel.setForeground(Color.RED);
                 tarifAdiLabel.setBackground(Color.BLACK);
                 tarifAdiLabel.setOpaque(true);
                 tarifHazirlamaSuresiLabel.setForeground(Color.RED);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.RED);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.RED);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
@@ -1115,12 +1181,17 @@ public class MainPage {
                 tarifHazirlamaSuresiLabel.setForeground(Color.GREEN);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.GREEN);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.GREEN);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
             }
+
             infoPanel.add(tarifAdiLabel);
             infoPanel.add(tarifHazirlamaSuresiLabel);
+            infoPanel.add(sumCostLabel);
             infoPanel.add(costLabel);
 
             singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);
@@ -1153,7 +1224,8 @@ public class MainPage {
             JPanel singleTarifPanel = new JPanel();
             singleTarifPanel.setLayout(new BorderLayout());
 
-            double toplamMaliyet = maliyetMap.get(sortedTarifler.get(i).getTarifID());
+            double gerekenMaliyet = maliyetMap.get(sortedTarifler.get(i).getTarifID());
+            double toplamMaliyet = toplamMaliyetMap.get(sortedTarifler.get(i).getTarifID());
 
             ListeAciklama.setText("EN HIZLIDAN EN YAVAŞA TARİFLER LİSTESİ");
 
@@ -1181,21 +1253,25 @@ public class MainPage {
             }
 
             JPanel infoPanel = new JPanel();
-            infoPanel.setLayout(new GridLayout(3, 1));
+            infoPanel.setLayout(new GridLayout(4, 1));
 
             JLabel tarifAdiLabel = new JLabel(sortedTarifler.get(i).getTarifAdi(), SwingConstants.CENTER);
             JLabel tarifHazirlamaSuresiLabel = new JLabel("Hazırlama Süresi : " + String.valueOf(sortedTarifler.get(i).getHazirlamaSuresi()) + " dakika", SwingConstants.CENTER);
-            JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
 
             System.out.println("Tarif : " + tarifler.get(i).getTarifID() + " işleniyor ve getiriliyor.");
 
-            if (toplamMaliyet > 0.0) {
+            if (gerekenMaliyet > 0.0) {
                 tarifAdiLabel.setForeground(Color.RED);
                 tarifAdiLabel.setBackground(Color.BLACK);
                 tarifAdiLabel.setOpaque(true);
                 tarifHazirlamaSuresiLabel.setForeground(Color.RED);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.RED);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.RED);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
@@ -1206,12 +1282,17 @@ public class MainPage {
                 tarifHazirlamaSuresiLabel.setForeground(Color.GREEN);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.GREEN);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.GREEN);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
             }
+
             infoPanel.add(tarifAdiLabel);
             infoPanel.add(tarifHazirlamaSuresiLabel);
+            infoPanel.add(sumCostLabel);
             infoPanel.add(costLabel);
 
             singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);
@@ -1244,7 +1325,8 @@ public class MainPage {
             JPanel singleTarifPanel = new JPanel();
             singleTarifPanel.setLayout(new BorderLayout());
 
-            double toplamMaliyet = maliyetMap.get(sortedTarifler.get(i).getTarifID());
+            double gerekenMaliyet = maliyetMap.get(sortedTarifler.get(i).getTarifID());
+            double toplamMaliyet = toplamMaliyetMap.get(sortedTarifler.get(i).getTarifID());
 
             ListeAciklama.setText("EN YAVAŞTAN EN HIZLIYA TARİFLER LİSTESİ");
 
@@ -1272,21 +1354,25 @@ public class MainPage {
             }
 
             JPanel infoPanel = new JPanel();
-            infoPanel.setLayout(new GridLayout(3, 1));
+            infoPanel.setLayout(new GridLayout(4, 1));
 
             JLabel tarifAdiLabel = new JLabel(sortedTarifler.get(i).getTarifAdi(), SwingConstants.CENTER);
             JLabel tarifHazirlamaSuresiLabel = new JLabel("Hazırlama Süresi : " + String.valueOf(sortedTarifler.get(i).getHazirlamaSuresi()) + " dakika", SwingConstants.CENTER);
-            JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+            JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
 
-            System.out.println("Tarif : " + tarifler.get(i).getTarifID() + " işleniyor ve getiriliyor.");
+            System.out.println("Tarif : " + sortedTarifler.get(i).getTarifID() + " işleniyor ve getiriliyor.");
 
-            if (toplamMaliyet > 0.0) {
+            if (gerekenMaliyet > 0.0) {
                 tarifAdiLabel.setForeground(Color.RED);
                 tarifAdiLabel.setBackground(Color.BLACK);
                 tarifAdiLabel.setOpaque(true);
                 tarifHazirlamaSuresiLabel.setForeground(Color.RED);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.RED);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.RED);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
@@ -1297,12 +1383,17 @@ public class MainPage {
                 tarifHazirlamaSuresiLabel.setForeground(Color.GREEN);
                 tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                 tarifHazirlamaSuresiLabel.setOpaque(true);
+                sumCostLabel.setForeground(Color.GREEN);
+                sumCostLabel.setBackground(Color.BLACK);
+                sumCostLabel.setOpaque(true);
                 costLabel.setForeground(Color.GREEN);
                 costLabel.setBackground(Color.BLACK);
                 costLabel.setOpaque(true);
             }
+
             infoPanel.add(tarifAdiLabel);
             infoPanel.add(tarifHazirlamaSuresiLabel);
+            infoPanel.add(sumCostLabel);
             infoPanel.add(costLabel);
 
             singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);
@@ -1322,9 +1413,10 @@ public class MainPage {
             JPanel singleTarifPanel = new JPanel();
             singleTarifPanel.setLayout(new BorderLayout());
 
-            double toplamMaliyet = maliyetMap.get(tarifler.get(i).getTarifID());
+            double gerekenMaliyet = maliyetMap.get(tarifler.get(i).getTarifID());
+            double toplamMaliyet = toplamMaliyetMap.get(tarifler.get(i).getTarifID());
 
-            ListeAciklama.setText(kategori.toUpperCase() + "LİSTESİ");
+            ListeAciklama.setText(kategori.toUpperCase() + " " + "LİSTESİ");
 
             if (tarifler.get(i).getKategori().equalsIgnoreCase(kategori)) {
                 tarifFiltreleyiciler.add(tarifler.get(i));
@@ -1352,23 +1444,25 @@ public class MainPage {
                 }
 
                 JPanel infoPanel = new JPanel();
-                infoPanel.setLayout(new GridLayout(3, 1));
+                infoPanel.setLayout(new GridLayout(4, 1));
 
                 JLabel tarifAdiLabel = new JLabel(tarifler.get(i).getTarifAdi(), SwingConstants.CENTER);
-
                 JLabel tarifHazirlamaSuresiLabel = new JLabel("Hazırlama Süresi : " + String.valueOf(tarifler.get(i).getHazirlamaSuresi()) + " dakika", SwingConstants.CENTER);
+                JLabel sumCostLabel = new JLabel("Toplam Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
+                JLabel costLabel = new JLabel("Gereken Maliyet : " + String.format("%.2f", gerekenMaliyet) + " TL", SwingConstants.CENTER);
 
                 System.out.println("Tarif : " + tarifler.get(i).getTarifID() + " işleniyor ve getiriliyor.");
 
-                JLabel costLabel = new JLabel("Maliyet : " + String.format("%.2f", toplamMaliyet) + " TL", SwingConstants.CENTER);
-
-                if (toplamMaliyet > 0.0) {
+                if (gerekenMaliyet > 0.0) {
                     tarifAdiLabel.setForeground(Color.RED);
                     tarifAdiLabel.setBackground(Color.BLACK);
                     tarifAdiLabel.setOpaque(true);
                     tarifHazirlamaSuresiLabel.setForeground(Color.RED);
                     tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                     tarifHazirlamaSuresiLabel.setOpaque(true);
+                    sumCostLabel.setForeground(Color.RED);
+                    sumCostLabel.setBackground(Color.BLACK);
+                    sumCostLabel.setOpaque(true);
                     costLabel.setForeground(Color.RED);
                     costLabel.setBackground(Color.BLACK);
                     costLabel.setOpaque(true);
@@ -1379,6 +1473,9 @@ public class MainPage {
                     tarifHazirlamaSuresiLabel.setForeground(Color.GREEN);
                     tarifHazirlamaSuresiLabel.setBackground(Color.BLACK);
                     tarifHazirlamaSuresiLabel.setOpaque(true);
+                    sumCostLabel.setForeground(Color.GREEN);
+                    sumCostLabel.setBackground(Color.BLACK);
+                    sumCostLabel.setOpaque(true);
                     costLabel.setForeground(Color.GREEN);
                     costLabel.setBackground(Color.BLACK);
                     costLabel.setOpaque(true);
@@ -1386,6 +1483,7 @@ public class MainPage {
 
                 infoPanel.add(tarifAdiLabel);
                 infoPanel.add(tarifHazirlamaSuresiLabel);
+                infoPanel.add(sumCostLabel);
                 infoPanel.add(costLabel);
 
                 singleTarifPanel.add(infoPanel, BorderLayout.SOUTH);
