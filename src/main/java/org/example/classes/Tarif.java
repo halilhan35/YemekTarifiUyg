@@ -8,6 +8,7 @@ public class Tarif {
     private int hazirlamaSuresi;
     private String talimatlar;
     private String tarifFotoYolu;
+    private double eslesmeYuzdesi = 0.00;
 
     public Tarif(int tarifID, String tarifAdi, String kategori, int hazirlamaSuresi, String talimatlar, String tarifFotoYolu){
         this.tarifID = tarifID;
@@ -38,6 +39,10 @@ public class Tarif {
         return talimatlar;
     }
 
+    public double getEslesmeYuzdesi() {
+        return eslesmeYuzdesi;
+    }
+
     public String getTarifFotoYolu() {
         return tarifFotoYolu;
     }
@@ -66,4 +71,7 @@ public class Tarif {
         this.tarifFotoYolu = tarifFotoYolu;
     }
 
+    public void setEslesmeYuzdesi(double eslesmeYuzdesi) {
+        this.eslesmeYuzdesi = eslesmeYuzdesi;
+    }
 }
