@@ -1,3 +1,1 @@
-Kullanıcının yemek tariflerini saklayabileceği ve eldeki mevcut malzemelerle hangi
-yemeklerin yapılabileceğini gösteren bir masaüstü uygulamasıdır. Uygulama,
-veritabanı yönetimi, dinamik arama ve filtreleme gibi işlevlerini yerine getirmektedir.
+Batın Erke Öztürk ile geliştirdiğimiz bu Yazılım Laboratuvarı projesinde,tariflerin saklanabildiği ve eldeki malzemelerle tariflerin yapılabilirliğinin değerlendirilebildiği bir Tarif Rehberi Uygulaması geliştirilmiştir. Uygulama, eksik malzemeleri belirleyip bunların toplam maliyetini hesaplamakta ve kullanıcıya sunmaktadır. Veritabanı entegrasyonu ile tarif ve malzeme verileri dinamik olarak saklanmakta, aynı zamanda arama ve filtreleme özellikleri ile tariflere erişim sağlanmaktadır. Bu sayede kullanıcılar, tariflerini mevcut malzemelerine göre analiz edebilmekte ve eksik ürünler için gerekli maliyeti kolayca öğrenebilmektedir.
